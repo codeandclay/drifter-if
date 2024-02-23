@@ -7,8 +7,27 @@ require 'pry'
 require_relative "../lib/event"
 require_relative "../lib/action"
 
+class DummyAction < Action
+  def run
+    subject.act
+    super
+  end
+end
+
+class DummySubject
+  attr_accessor :counter
+
+  def initialize
+    @counter = 0
+  end
+
+  def act
+    self.counter += 1
+  end
+end
+
 describe Action do
-  let(:action) { Action.new }
+  let(:action) { DummyAction.new(DummySubject.new) }
 
   it "Should run successfully" do
     assert_equal :success, action.run
@@ -16,37 +35,79 @@ describe Action do
 end
 
 describe Event do
-  let(:action) { Action.new }
+  let(:subject) { DummySubject.new }
+  let(:action) { DummyAction.new(subject) }
   let(:event) { Event.new(actions: [action] )}
 
-  it "Should run an event" do
-    skip
+  let(:before_event_count) { [*1..10].sample }
+  let(:after_event_count) { [*1..10].sample }
 
+  let(:before_events) { Array.new(before_event_count) { Event.new(actions: [action]) } }
+  let(:after_events) { Array.new(after_event_count) { Event.new(actions: [action]) } }
+
+  it "Should run an event" do
+    initial_count = subject.counter
     event.fire
 
-    # assert action.executed?
+    assert_equal initial_count + event.actions.count, subject.counter
   end
 
   it "Should run an event before firing" do
-    skip
+    initial_count = subject.counter
+
+    event = Event.new(actions: [action], options: { before_events: before_events } )
+                 .tap { |obj| obj.fire }
+
+    total_actions =
+      [initial_count, before_event_count, event.actions.count].sum
+
+    assert_equal total_actions, subject.counter
   end
 
   it "Should run an event after firing" do
-    skip
+    initial_count = subject.counter
+
+    event = Event.new(actions: [action], options: { after_events: after_events } )
+                 .tap { |obj| obj.fire }
+
+    total_actions =
+      [initial_count, after_event_count, event.actions.count].sum
+
+    assert_equal total_actions, subject.counter
   end
 
   it "Should run an event before and after firing" do
-    skip
+    initial_count = subject.counter
+
+    options = { before_events: before_events, after_events: after_events }
+    event = Event.new(actions: [action], options: options ).tap { |obj| obj.fire }
+
+    total_actions =
+      [initial_count, before_event_count, after_event_count, event.actions.count].sum
+
+    assert_equal total_actions, subject.counter
   end
 
   it "Should run multiple actions" do
-    skip
+    initial_count = subject.counter
+    total_actions = [*1..10].sample
 
-    total_actions = 5
-
-    actions = Array.new(total_actions) { Action.new }
+    actions = Array.new(total_actions) { action }
     event = Event.new(actions: actions).tap { |obj| obj.fire }
 
-    # assert_equal total_actions, event.actions.count { |action| action.executed? }
+    assert_equal initial_count + total_actions, subject.counter
+  end
+
+  it "Should run without main action" do
+    initial_count = subject.counter
+
+    options = { before_events: before_events, after_events: after_events }
+
+    event = Event.new(actions: [], options: options ).tap { |obj| obj.fire }
+
+    total_count =
+      [ initial_count, before_event_count, after_event_count].sum
+
+    assert_equal total_count, subject.counter
   end
 end

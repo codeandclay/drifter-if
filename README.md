@@ -1,14 +1,14 @@
 # Drifter IF
 
-WIP: The beggings of a text adventure framework.
+WIP: The beginnings of a text adventure framework.
 
 ## Notes
 
-If items are the props and scenery, events and actions are the on-stage movement.
+Things are the props and scenery.
 
 For anything to happen in the world, an action has to run.
 
-Actions are run by events.
+Actions are run by events. They can be initialized with subjects.
 
 An event is fired. An event runs one or more actions.
 
