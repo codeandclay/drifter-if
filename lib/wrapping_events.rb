@@ -6,11 +6,11 @@ class WrappingEvents
     @after = after
   end
 
-  def fire_around
-    before.each &:fire
+  def run_around
+    before.each &:run
 
     yield
 
-    after.each &:fire
+    after.each &:run
   end
 end

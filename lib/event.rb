@@ -8,8 +8,8 @@ class Event
     @wrapping_events = wrap_with
   end
 
-  def fire
-    wrapping_events.fire_around do
+  def run
+    wrapping_events.run_around do
       actions.each &:run
     end
   end

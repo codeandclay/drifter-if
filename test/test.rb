@@ -56,7 +56,7 @@ describe Event do
 
   it "Should run an event" do
     initial_count = subject.counter
-    event.fire
+    event.run
 
     assert_equal initial_count + event.actions.count, subject.counter
   end
@@ -66,7 +66,7 @@ describe Event do
     wrapping_events = WrappingEvents.new(before: before_events)
 
     event = Event.new(actions: [action], wrap_with: wrapping_events)
-                 .tap { |obj| obj.fire }
+                 .tap { |obj| obj.run }
 
 
     total_actions =
@@ -80,7 +80,7 @@ describe Event do
     wrapping_events = WrappingEvents.new(after: after_events)
 
     event = Event.new(actions: [action], wrap_with: wrapping_events )
-                 .tap { |obj| obj.fire }
+                 .tap { |obj| obj.run }
 
     total_actions =
       [initial_count, after_event_count, event.actions.count].sum
@@ -93,7 +93,7 @@ describe Event do
 
     wrapping_events = WrappingEvents.new before: before_events, after: after_events
 
-    event = Event.new(actions: [action], wrap_with: wrapping_events ).tap { |obj| obj.fire }
+    event = Event.new(actions: [action], wrap_with: wrapping_events ).tap { |obj| obj.run }
 
     total_actions =
       [initial_count, before_event_count, after_event_count, event.actions.count].sum
@@ -106,7 +106,7 @@ describe Event do
     total_actions = [*1..10].sample
 
     actions = Array.new(total_actions) { action }
-    event = Event.new(actions: actions).tap { |obj| obj.fire }
+    event = Event.new(actions: actions).tap { |obj| obj.run }
 
     assert_equal initial_count + total_actions, subject.counter
   end
@@ -116,11 +116,21 @@ describe Event do
 
     wrapping_events = WrappingEvents.new before: before_events, after: after_events
 
-    event = Event.new(actions: [], wrap_with: wrapping_events ).tap { |obj| obj.fire }
+    event = Event.new(actions: [], wrap_with: wrapping_events ).tap { |obj| obj.run }
 
     total_count =
       [ initial_count, before_event_count, after_event_count].sum
 
     assert_equal total_count, subject.counter
+  end
+
+  it "Should run an Event if passed to actions" do
+    initial_count = subject.counter
+
+    event_count = [*1..10].sample
+
+    event_count.times { Event.new(actions: [event]).tap { |obj| obj.run } }
+
+    assert_equal initial_count + event_count, subject.counter
   end
 end
