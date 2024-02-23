@@ -26,15 +26,6 @@ class DummySubject
   end
 end
 
-# class WrappingEvents
-#   attr_reader :before, :after
-
-#   def initialize(before: [], after [])
-#     @before = before
-#     @after = after
-#   end
-# end
-
 describe Action do
   let(:action) { DummyAction.new(DummySubject.new) }
 
@@ -106,7 +97,7 @@ describe Event do
     total_actions = [*1..10].sample
 
     actions = Array.new(total_actions) { action }
-    event = Event.new(actions: actions).tap { |obj| obj.run }
+    Event.new(actions: actions).tap { |obj| obj.run }
 
     assert_equal initial_count + total_actions, subject.counter
   end
@@ -116,7 +107,7 @@ describe Event do
 
     wrapping_events = WrappingEvents.new before: before_events, after: after_events
 
-    event = Event.new(actions: [], wrap_with: wrapping_events ).tap { |obj| obj.run }
+    Event.new(actions: [], wrap_with: wrapping_events ).tap { |obj| obj.run }
 
     total_count =
       [ initial_count, before_event_count, after_event_count].sum
@@ -128,7 +119,6 @@ describe Event do
     initial_count = subject.counter
 
     event_count = [*1..10].sample
-
     event_count.times { Event.new(actions: [event]).tap { |obj| obj.run } }
 
     assert_equal initial_count + event_count, subject.counter
