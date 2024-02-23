@@ -1,10 +1,9 @@
 class Event
-  attr_accessor :actions, :before_events, :after_events
+  attr_accessor :actions, :wrapping_events
 
-  def initialize(actions:, options: { before_events:, after_events: })
+  def initialize(actions:, wrap: {})
     @actions = actions
-    @before_events = options[:before_events] ||= []
-    @after_events = options[:after_events] ||= []
+    @wrapping_events = { before: [] , after: [] }.merge wrap
   end
 
   def fire
@@ -16,10 +15,10 @@ class Event
   end
 
   def fire_before_events
-    before_events.each &:fire
+    wrapping_events[:before].each &:fire
   end
 
   def fire_after_events
-    after_events.each &:fire
+    wrapping_events[:after].each &:fire
   end
 end

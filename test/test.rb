@@ -55,7 +55,7 @@ describe Event do
   it "Should run an event before firing" do
     initial_count = subject.counter
 
-    event = Event.new(actions: [action], options: { before_events: before_events } )
+    event = Event.new(actions: [action], wrap: { before: before_events })
                  .tap { |obj| obj.fire }
 
     total_actions =
@@ -67,7 +67,7 @@ describe Event do
   it "Should run an event after firing" do
     initial_count = subject.counter
 
-    event = Event.new(actions: [action], options: { after_events: after_events } )
+    event = Event.new(actions: [action], wrap: { after: after_events } )
                  .tap { |obj| obj.fire }
 
     total_actions =
@@ -79,8 +79,8 @@ describe Event do
   it "Should run an event before and after firing" do
     initial_count = subject.counter
 
-    options = { before_events: before_events, after_events: after_events }
-    event = Event.new(actions: [action], options: options ).tap { |obj| obj.fire }
+    wrapping_events = { before: before_events, after: after_events }
+    event = Event.new(actions: [action], wrap: wrapping_events ).tap { |obj| obj.fire }
 
     total_actions =
       [initial_count, before_event_count, after_event_count, event.actions.count].sum
@@ -101,9 +101,9 @@ describe Event do
   it "Should run without main action" do
     initial_count = subject.counter
 
-    options = { before_events: before_events, after_events: after_events }
+    wrapping_events = { before: before_events, after: after_events }
 
-    event = Event.new(actions: [], options: options ).tap { |obj| obj.fire }
+    event = Event.new(actions: [], wrap: wrapping_events ).tap { |obj| obj.fire }
 
     total_count =
       [ initial_count, before_event_count, after_event_count].sum
