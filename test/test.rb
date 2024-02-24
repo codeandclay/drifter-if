@@ -8,9 +8,8 @@ require_relative "../lib/event"
 require_relative "../lib/action"
 
 class DummyAction < Action
-  def run
-    subject.act
-    super
+  def command
+    -> { subject.act }
   end
 end
 

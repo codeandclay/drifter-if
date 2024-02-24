@@ -6,7 +6,11 @@ class Action
   end
 
   def run
-    # Do something to subject and return status
+    command.call
     :success
+  end
+
+  def command
+    -> {}
   end
 end
