@@ -31,6 +31,10 @@ describe Action do
   it "Should run successfully" do
     assert_equal :success, action.run
   end
+
+  it "Should raise and error if command is not implemented" do
+    assert_raises(NotImplementedError) { Action.new(DummySubject).run }
+  end
 end
 
 describe Event do

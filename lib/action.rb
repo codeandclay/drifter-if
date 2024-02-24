@@ -11,6 +11,6 @@ class Action
   end
 
   def command
-    -> {}
+    raise NotImplementedError, "Class must supply a command to run"
   end
 end
